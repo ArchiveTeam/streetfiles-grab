@@ -96,6 +96,46 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     return urls
   end
 
+  -- GROUP PAGE
+  local groupname = string.match(url, "^http://streetfiles%.org/groups/([-.a-zA-Z0-9_]+)$")
+  if groupname then
+    table.insert(urls, { url=("http://streetfiles.org/groups/"..groupname.."/"), link_expect_html=1 })
+    table.insert(urls, { url=("http://streetfiles.org/groups/"..groupname.."/members/"), link_expect_html=1 })
+    table.insert(urls, { url=("http://streetfiles.org/groups/"..groupname.."/topics/"), link_expect_html=1 })
+
+    return urls
+  end
+
+  -- GROUP TOPICS PAGE
+  local groupname = string.match(url, "^http://streetfiles%.org/groups/([-.a-zA-Z0-9_]+)/topics")
+  if groupname then
+    local html = read_file(file)
+    follow_pagination(urls, html)
+
+    -- topics
+    for topic in string.gmatch(html, "/topic/([0-9]+)\"") do
+      table.insert(urls, { url=("http://streetfiles.org/groups/"..groupname.."/topic/"..topic), link_expect_html=1 })
+    end
+
+    return urls
+  end
+
+  -- GROUP TOPIC PAGE
+  local groupname = string.match(url, "^http://streetfiles%.org/groups/([-.a-zA-Z0-9_]+)/topic/[0-9]+")
+  if groupname then
+    local html = read_file(file)
+    follow_pagination(urls, html)
+    return urls
+  end
+
+  -- GROUP MEMBERS PAGE
+  local groupname = string.match(url, "^http://streetfiles%.org/groups/([-.a-zA-Z0-9_]+)/members")
+  if groupname then
+    local html = read_file(file)
+    follow_pagination(urls, html)
+    return urls
+  end
+
   -- OTHER PAGES WITH PAGINATION
   for i, pagetype in ipairs({ "bookmarks", "friends", "groups", "group_messages", "loves", "hates" }) do
     local username = string.match(url, "^http://streetfiles%.org/([-.a-zA-Z0-9_]+)/"..pagetype)
