@@ -42,7 +42,7 @@ USER_AGENT = "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.20
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20130428.02"
+VERSION = "20130428.03"
 
 
 
@@ -190,7 +190,7 @@ pipeline = Pipeline(
       "--warc-header", "operator: Archive Team",
       "--warc-header", "streetfiles-dld-script-version: " + VERSION,
       "--warc-header", ItemInterpolation("streetfiles-task: %(item_name)s"),
-      ItemInterpolation("http://streetfiles.org/%(item_name)s")
+      ItemInterpolation("%(seed_url)s")
     ],
     max_tries = 2,
     # check this: which Wget exit codes count as a success?
